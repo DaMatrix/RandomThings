@@ -1,0 +1,64 @@
+allprojects {
+    ext {
+        //general things
+        javaVersion = "1.8"
+        randomThingsVersion = "0.0.1-SNAPSHOT"
+
+        //dependency things
+        junitVersion = "4.12"
+        lombokVersion = "1.18.8"
+        nettyVersion = "4.1.36.Final"
+        porklibVersion = "0.4.0-SNAPSHOT"
+    }
+
+    group "net.daporkchop"
+    version "$randomThingsVersion"
+}
+
+subprojects {
+    apply plugin: "java"
+
+    compileJava {
+        sourceCompatibility = targetCompatibility = "$javaVersion"
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+    repositories {
+        mavenLocal()
+        maven {
+            name = "DaPorkchop_"
+            url = "https://maven.daporkchop.net/"
+        }
+        mavenCentral()
+    }
+
+    configurations {
+        shade
+        compile.extendsFrom shade
+    }
+
+    dependencies {
+        testCompile "junit:junit:$junitVersion"
+
+        compileOnly "org.projectlombok:lombok:$lombokVersion"
+        annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    }
+
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allSource
+    }
+
+    test {
+        testLogging {
+            //show System.out calls in tests in gradle output
+            showStandardStreams = true
+
+            showExceptions = true
+            showStackTraces = true
+            showCauses = true
+        }
+    }
+}
