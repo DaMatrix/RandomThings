@@ -13,9 +13,42 @@
  *
  */
 
-dependencies {
-    compile "net.daporkchop.lib:binary:$porklibVersion"
-    compile "net.daporkchop.lib:logging:$porklibVersion"
+package net.daporkchop.journeymaptomapcrafter;
 
-    compile "io.netty:netty-buffer:$nettyVersion"
+import net.daporkchop.lib.logging.LogAmount;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.Imaging;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import static net.daporkchop.lib.logging.Logging.*;
+
+/**
+ * @author DaPorkchop_
+ */
+public class JourneymapToMapcrafter {
+    public static File inputImg;
+    public static int  textureSize;
+
+    public static int width;
+    public static int height;
+
+    public static void main(String... args) throws IOException, ImageReadException {
+        logger.enableANSI().setLogAmount(LogAmount.DEBUG);
+
+        inputImg = new File(args[0]);
+        textureSize = Integer.parseInt(args[1]);
+
+        ImageInputStream stream = ImageIO.createImageInputStream(inputImg);
+        ImageReader reader = ImageIO.getImageReaders(stream).next();
+        reader.setInput(stream);
+        width = reader.getWidth(0);
+        height = reader.getHeight(0);
+        logger.info("Source image dimensions: %dx%d", width, height);
+    }
 }

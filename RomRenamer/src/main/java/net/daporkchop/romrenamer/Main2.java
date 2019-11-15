@@ -13,7 +13,7 @@
  *
  */
 
-package daporkchop.romrenamer;
+package net.daporkchop.romrenamer;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;

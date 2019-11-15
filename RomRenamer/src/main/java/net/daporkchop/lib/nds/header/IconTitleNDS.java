@@ -13,7 +13,7 @@
  *
  */
 
-package daporkchop.lib.nds.header;
+package net.daporkchop.lib.nds.header;
 
 import net.daporkchop.lib.common.util.PorkUtil;
 

@@ -14,7 +14,7 @@
  */
 
 dependencies {
-    compile "net.daporkchop.lib:binary:0.4.0-SNAPSHOT"
+    compile "net.daporkchop.lib:binary:$porklibVersion"
     compile "net.daporkchop.lib:nds:0.3.0-SNAPSHOT"
 
     compile "com.madgag:animated-gif-lib:1.5-SNAPSHOT"

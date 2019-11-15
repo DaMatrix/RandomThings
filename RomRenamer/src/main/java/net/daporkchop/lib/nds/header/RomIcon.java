@@ -13,7 +13,7 @@
  *
  */
 
-package daporkchop.lib.nds.header;
+package net.daporkchop.lib.nds.header;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;

@@ -13,7 +13,7 @@
  *
  */
 
-package daporkchop.romrenamer;
+package net.daporkchop.romrenamer;
 
 import java.io.File;
 import java.io.IOException;

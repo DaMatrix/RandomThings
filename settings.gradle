@@ -15,5 +15,7 @@
 
 rootProject.name = 'RandomThings'
 
+include 'JourneymapToMapcrafter'
 include 'MapcrafterMerger'
 include 'RomRenamer'
+
