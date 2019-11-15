@@ -21,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -29,28 +31,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 
-import static net.daporkchop.lib.math.primitive.PMath.max;
-
-enum Sector {
-    TOP_LEFT(),
-    TOP_RIGHT(),
-    BOTTOM_LEFT(),
-    BOTTOM_RIGHT();
-
-    public static final Sector[] VALUES = values();
-
-    public static Sector fromIndex(int i) {
-        return VALUES[i];
-    }
-
-    public static Sector fromOffsetIndex(int i) {
-        return VALUES[i - 1];
-    }
-
-    public int offsetIndex() {
-        return this.ordinal() + 1;
-    }
-}
+import static net.daporkchop.lib.math.primitive.PMath.*;
 
 /**
  * @author DaPorkchop_
@@ -62,9 +43,10 @@ public final class QuadTree<V> extends Node<V> {
         src.forEach(dst::push);
         return dst;
     }
+
     private final Node<V> delegate;
-    private final Lock readLock;
-    private final Lock writeLock;
+    private final Lock    readLock;
+    private final Lock    writeLock;
 
     public QuadTree() {
         this.delegate = new ReferenceNode<>(null);
@@ -237,6 +219,26 @@ public final class QuadTree<V> extends Node<V> {
     private void indent(@NonNull StringBuilder builder, int count) {
         while (--count >= 0) {
             builder.append(' ');
+        }
+    }
+
+    public static Collection<Stack<Integer>> computeAllPossiblePaths(int depth) {
+        List<Stack<Integer>> out = new ArrayList<>();
+        computeAllPossiblePathsRecursive(out, new Stack<>(), depth);
+        return out;
+    }
+
+    private static void computeAllPossiblePathsRecursive(@NonNull Collection<Stack<Integer>> out, @NonNull Stack<Integer> stack, int depth) {
+        if (depth == 0) {
+            Stack<Integer> copy = new Stack<>();
+            stack.forEach(copy::push);
+            out.add(copy);
+        } else {
+            for (Sector sector : Sector.VALUES) {
+                stack.push(sector.offsetIndex());
+                computeAllPossiblePathsRecursive(out, stack, depth - 1);
+                stack.pop();
+            }
         }
     }
 }

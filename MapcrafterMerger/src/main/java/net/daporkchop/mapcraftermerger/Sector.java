@@ -13,13 +13,34 @@
  *
  */
 
-dependencies {
-    compile "net.daporkchop.lib:binary:$porklibVersion"
-    compile "net.daporkchop.lib:logging:$porklibVersion"
+package net.daporkchop.mapcraftermerger;
 
-    compile "io.netty:netty-buffer:$nettyVersion"
+import lombok.AllArgsConstructor;
 
-    //compile "org.apache.commons:commons-imaging:1.0-alpha1"
+/**
+ * @author DaPorkchop_
+ */
+@AllArgsConstructor
+public enum Sector {
+    TOP_LEFT(-1, -1),
+    TOP_RIGHT(1, -1),
+    BOTTOM_LEFT(-1, 1),
+    BOTTOM_RIGHT(1, 1);
 
-    compile project(":MapcrafterMerger")
+    public static final Sector[] VALUES = values();
+
+    public static Sector fromIndex(int i) {
+        return VALUES[i];
+    }
+
+    public static Sector fromOffsetIndex(int i) {
+        return VALUES[i - 1];
+    }
+
+    public final int deltaX;
+    public final int deltaY;
+
+    public int offsetIndex() {
+        return this.ordinal() + 1;
+    }
 }

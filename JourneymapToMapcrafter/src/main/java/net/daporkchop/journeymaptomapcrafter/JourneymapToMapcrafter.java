@@ -15,16 +15,24 @@
 
 package net.daporkchop.journeymaptomapcrafter;
 
+import net.daporkchop.lib.common.function.io.IOConsumer;
+import net.daporkchop.lib.common.function.io.IOSupplier;
+import net.daporkchop.lib.common.function.throwing.ESupplier;
+import net.daporkchop.lib.common.util.PorkUtil;
 import net.daporkchop.lib.logging.LogAmount;
-import org.apache.commons.imaging.ImageReadException;
-import org.apache.commons.imaging.Imaging;
+import net.daporkchop.mapcraftermerger.QuadTree;
+import net.daporkchop.mapcraftermerger.Sector;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Stack;
 
 import static net.daporkchop.lib.logging.Logging.*;
 
@@ -32,23 +40,57 @@ import static net.daporkchop.lib.logging.Logging.*;
  * @author DaPorkchop_
  */
 public class JourneymapToMapcrafter {
+    public static QuadTree<File> images;
+
     public static File inputImg;
     public static int  textureSize;
 
     public static int width;
     public static int height;
 
-    public static void main(String... args) throws IOException, ImageReadException {
+    public static int depth;
+
+    public static void main(String... args) throws IOException {
         logger.enableANSI().setLogAmount(LogAmount.DEBUG);
 
         inputImg = new File(args[0]);
         textureSize = Integer.parseInt(args[1]);
 
-        ImageInputStream stream = ImageIO.createImageInputStream(inputImg);
-        ImageReader reader = ImageIO.getImageReaders(stream).next();
-        reader.setInput(stream);
-        width = reader.getWidth(0);
-        height = reader.getHeight(0);
+        ThreadLocal<ImageReader> READER_CACHE = ThreadLocal.withInitial((IOSupplier<ImageReader>) () -> {
+            ImageInputStream stream = ImageIO.createImageInputStream(inputImg);
+            ImageReader reader = ImageIO.getImageReaders(stream).next();
+            reader.setInput(stream);
+            return reader;
+        });
+        width = READER_CACHE.get().getWidth(0);
+        height = READER_CACHE.get().getHeight(0);
         logger.info("Source image dimensions: %dx%d", width, height);
+        if (width != height) throw new IllegalArgumentException("Image is not square!");
+
+        depth = 0;
+        for (int bpp = (width >> 1) / 512; bpp >= 1; bpp >>= 1) {
+            depth++;
+        }
+        logger.info("Required depth: %d", depth);
+
+        Collection<Stack<Integer>> paths = QuadTree.computeAllPossiblePaths(depth);
+        paths.stream()
+                //.parallel()
+                .forEach((IOConsumer<Stack<Integer>>) path -> {
+            ImageReader reader = READER_CACHE.get();
+            int posX = width >> 1;
+            int posY = width >> 1;
+            int d = 1;
+            for (Integer i : path)  {
+                d++;
+                Sector sector = Sector.fromOffsetIndex(i);
+                posX += (width >> d) * sector.deltaX;
+                posY += (width >> d) * sector.deltaY;
+            }
+
+            ImageReadParam param = reader.getDefaultReadParam();
+            param.setSourceRegion(new Rectangle(posX, posY, textureSize, textureSize));
+            PorkUtil.simpleDisplayImage(reader.read(0, param));
+        });
     }
 }
