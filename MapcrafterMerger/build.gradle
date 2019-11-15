@@ -13,7 +13,11 @@
  *
  */
 
-rootProject.name = 'RandomThings'
+dependencies {
+    compile "net.daporkchop.lib:binary:$porklibVersion"
+    compile "net.daporkchop.lib:logging:$porklibVersion"
 
-include 'MapcrafterMerger'
-include 'RomRenamer'
+    compile "io.netty:netty-buffer:$nettyVersion"
+
+    compile "com.google.code.gson:gson:$gsonVersion"
+}
